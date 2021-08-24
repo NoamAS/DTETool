@@ -1,33 +1,42 @@
-# -*- coding: utf-8 -*-
-"""
-DTETool v1.1
-This tool is for internal use only
-The tool can pull out DICOM tag fileds and save them to xlsx file .
-"""
-#Imported packages
-
-
 from tkinter import *
+from tkinter import Scale
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
 from termcolor import cprint ,colored
 import pydicom
 import pandas as pd
-import time
-import os 
+import os
 
 
-class gettingDataFromDICOM:
-    def DICOMData(dcmread):
-        pass
-    #Asking the user to choose input location
-    print('Welcome to DTETool v1.1')
+
+ 
+
+
+        
+   
+print('Welcome to DTETool v1.1')
     
 
+#Asking the user to choose input location
+
 def filelocainput():
+    global Data
     filelocationinput = filedialog.askopenfilename()
     Data = pydicom.dcmread(filelocationinput , force = True )
-
+    if Data is None:
+         Data = 1
+         
+   
+    
+    class CheckboxState():
+     def cPID():
+         if(CheckBoxPID.get(Data.PatientID)==1):
+          Scale.config(state=ACTIVE)
+         elif Data.PatientID.get() == 0:
+          Scale.config(state=DISABLED)
+    
+  
 
 
     print('PatientID -',Data.PatientID)
@@ -36,6 +45,7 @@ def filelocainput():
     print('StudyDate -',Data.StudyDate)
     print('PatientName -' ,Data.PatientName)
     print('ScanOptions -' ,Data.ScanOptions)
+    print('TotalCollimationWidth -',Data.TotalCollimationWidth)
     print('SeriesDescription',Data.SeriesDescription)
     print('SeriesNumber -',Data.SeriesNumber)
     print('PatientSex -' ,Data.PatientSex)
@@ -47,17 +57,22 @@ def filelocainput():
     print('InstitutionAddress -',Data.InstitutionAddress)
     print('KVP -'  ,Data.KVP)
     print('ManufacturerModelName -' ,Data.ManufacturerModelName)
+   
+
+    
 
 
-
-              
-
-    df = pd.DataFrame ({'PatientID ': [Data.PatientID],
+    df = pd.DataFrame ({
+        
+        
+        
+                        'PatientID ': [Data.PatientID],
                         'StudyID ': [Data.StudyID],
                         'StudyDescription':[Data.StudyDescription],
                         'StudyDate ': [Data.StudyDate],
                         'PatientName ': [Data.PatientName.given_name],
                         'ScanOptions': [Data.ScanOptions],
+                        'TotalCollimationWidth': [str([Data.TotalCollimationWidth])],
                         'SeriesDescription':[Data.SeriesDescription],
                         'SeriesNumber':[Data.SeriesNumber.original_string],
                         'PatientSex' : [Data.PatientSex],
@@ -69,37 +84,53 @@ def filelocainput():
                         'InstitutionAddress':[Data.InstitutionAddress],
                         'KVP':[Data.KVP.original_string],
                         'ManufacturerModelName':[Data.ManufacturerModelName],
+                        
+                        
 
         })
 
 
-        
+     #Asking the user to choose output location   
     class filelocaoutput:
        def SaveDatatoxlsx():
            pass
-    df.to_excel ('Param.xlsx')
+       filelocaloutput = filedialog.asksaveasfilename(defaultextension = 'xlsx')
+       df.to_excel (filelocaloutput)
 
 
 
-    cprint('xlsx file was saved secussfully', 'yellow')
+  
 
-time.sleep(5)
 
-root = Tk('DTETool')
-root.geometry("400x100")
-title=Label(root, text='DTETool v1.1',font=('',12))
-title.pack(side=TOP)
-# wnp=tk.Label(root, text='Done!',font=('',10))
-# wnp.place(y=70, x=250)
-browse = Button(root, text='Browse',command = filelocainput)
-browse.place(y=30, x=170)
-# run = Button(root, text='Run')
-# run.place(y=70 , x=180)
-# browseBox = Entry(root)
-# browseBox.place(y=50 , x=50)
+       
+root = Tk()
+root.geometry("600x500")
+Scallbtn = ttk.Button(root , text = 'Select All')
+Scallbtn.place(y=450 , x=430)
+Run_btn = ttk.Button(root, text='Run',command = filelocainput)
+Run_btn.place(y=450, x=520)
+# MainWindowbg = PhotoImage(file="BG.png")
+# MainWindowbg_label = Label(root , image=MainWindowbg)
+# MainWindowbg_label.place(y=0,x=0 , relwidth =1 , relheight=1)
+CreatedBy = ttk.Label(root , text = 'Created By : Noam.Asulin@Philips.com')
+CreatedBy.config(font=("Ariel", 7))
+CreatedBy.place(y=450 , x=20)
+PhilipsMedicalSystems = ttk.Label(root , text='Philips Medical Systems ')
+PhilipsMedicalSystems.place(y=460 , x=20)
+PhilipsMedicalSystems.config(font=("Ariel", 7))
+
+
+     
+cPID = IntVar()
+CheckBoxPID = Checkbutton(root , 
+                            text = 'PatientID',variable = cPID,
+                            onvalue = 1 , offvalue = 0 , command=cPID,
+                       )
+CheckBoxPID.place(y=20 , x=20)
+
+
+
+
+
+
 root.mainloop()
-
-
-
-
-#
